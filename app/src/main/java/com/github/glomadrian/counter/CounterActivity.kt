@@ -14,11 +14,11 @@ import kotlinx.coroutines.launch
 
 class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterIntent> {
 
-    private val resetCounterButton by lazy {
-        findViewById<AppCompatButton>(R.id.addMovie)
-    }
     private val feedViewModel by lazy {
         CounterViewModel()
+    }
+    private val resetCounterButton by lazy {
+        findViewById<AppCompatButton>(R.id.addMovie)
     }
     private val addOnePointTeamA by lazy {
         findViewById<AppCompatButton>(R.id.addOnePointTeamA)
