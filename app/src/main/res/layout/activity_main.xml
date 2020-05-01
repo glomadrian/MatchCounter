@@ -4,19 +4,110 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".feed.FeedActivity">
+    tools:context=".counter.CounterActivity">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swiperefresh"
-        android:layout_width="match_parent"
+
+   <androidx.appcompat.widget.LinearLayoutCompat
+       android:id="@+id/teamACounter"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintEnd_toStartOf="@id/teamBCounter"
+        android:layout_width="0dp"
         android:layout_height="match_parent">
 
-        <ListView
-            android:id="@android:id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:text="Team A"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/teamAPoints"
+            android:text="0"
+            android:textSize="24sp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_marginTop="34dp"
+            android:id="@+id/addOnePointTeamA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="#8CFFCB"
+            android:text="+1 Point"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/addThreePointTeamA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="#8CFFCB"
+            android:text="+3 Point"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/addFivePointTeamA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="#8CFFCB"
+            android:text="+5 Point"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/teamBCounter"
+        app:layout_constraintStart_toEndOf="@id/teamACounter"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:text="Team B"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/teamBPoints"
+            android:text="0"
+            android:textSize="24sp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_marginTop="34dp"
+            android:id="@+id/addOnePointTeamB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="#8CFFCB"
+            android:text="+1 Point"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/addThreePointTeamB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="#8CFFCB"
+            android:text="+3 Point"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/addFivePointTeamB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="#8CFFCB"
+            android:text="+5 Point"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/addMovie"
@@ -24,7 +115,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="16dp"
-        android:text="Add movie"
+        android:text="Clear counter"
         android:layout_width="200dp"
         android:layout_height="50dp" />
 

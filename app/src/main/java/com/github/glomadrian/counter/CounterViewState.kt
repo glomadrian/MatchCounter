@@ -1,8 +1,8 @@
-package com.github.glomadrian.feed
+package com.github.glomadrian.counter
 
 import com.github.glomadrian.mvi.State
 
-data class FeedViewState(
+data class CounterViewState(
     val isLoading: Boolean,
     val error: Throwable?
 ) : State
