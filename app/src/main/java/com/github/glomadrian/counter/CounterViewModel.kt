@@ -1,90 +1,68 @@
 package com.github.glomadrian.counter
 
-import com.github.glomadrian.background
 import com.github.glomadrian.domain.AddPointsToTeam
 import com.github.glomadrian.domain.Team
-import com.github.glomadrian.exhaustive
 import com.github.glomadrian.mvi.ViewModel
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.flow
 
 class CounterViewModel(
     private val addPointsToTeam: AddPointsToTeam
-) : ViewModel<CounterIntent, CounterViewState> {
+) : ViewModel<CounterIntent, CounterViewState, CounterAction, CounterResult>() {
 
     private val statesChannel = Channel<CounterViewState>()
-    private var state = CounterViewState(false, 0, 0, null)
+    override var state = CounterViewState(false, 0, 0, null)
 
     override fun states() = statesChannel.consumeAsFlow()
 
-    override fun processIntents(intents: Flow<CounterIntent>) {
-        intents.transform {
-            when (it) {
-                CounterIntent.InitView -> {
-                }
-                is CounterIntent.AddOnePointToTeam -> emit(
-                    CounterAction.AddPointsToTeam(
-                        1,
-                        it.team
-                    )
-                )
-                is CounterIntent.AddThreePointToTeam -> emit(
-                    CounterAction.AddPointsToTeam(
-                        3,
-                        it.team
-                    )
-                )
-                is CounterIntent.AddFivePointToTeam -> emit(
-                    CounterAction.AddPointsToTeam(
-                        5,
-                        it.team
-                    )
-                )
-                CounterIntent.ClearCounter -> emit(CounterAction.ClearTeamPoints)
-            }.exhaustive
-        }.flatMapConcat {
-            when (it) {
-                is CounterAction.AddPointsToTeam -> addPointsToTeam(it.points, it.team)
-                CounterAction.ClearTeamPoints -> addPointsToTeam(2, Team.A)
-            }
-        }.scan(state) { acc, value ->
-            reduce(acc, value)
-        }.distinctUntilChanged()
-            .flowOn(background)
-            .onEach { statesChannel.send(it) }
-            .launchIn(GlobalScope)
+    override suspend fun intentToActionMatcher(intent: CounterIntent) =
+        when (intent) {
+            CounterIntent.InitView -> CounterAction.None
+            is CounterIntent.AddOnePointToTeam -> CounterAction.AddPointsToTeam(1, intent.team)
+            is CounterIntent.AddThreePointToTeam -> CounterAction.AddPointsToTeam(3, intent.team)
+            is CounterIntent.AddFivePointToTeam -> CounterAction.AddPointsToTeam(5, intent.team)
+            CounterIntent.ClearCounter -> CounterAction.ClearTeamPoints
+        }
+
+    override fun actionExecutor(counterAction: CounterAction) =
+        when (counterAction) {
+            is CounterAction.AddPointsToTeam -> addPointsToTeam(
+                counterAction.points,
+                counterAction.team
+            )
+            CounterAction.ClearTeamPoints -> addPointsToTeam(2, Team.A)
+            CounterAction.None -> flow { emit(CounterResult.NoResult) }
+        }
+
+    override fun reduceMatcher(
+        previousState: CounterViewState,
+        result: CounterResult
+    ) = when (result) {
+        is CounterResult.AddPointsResult.PointsAdded -> reducePointsAdded(previousState, result)
+        is CounterResult.AddPointsResult.PointNotAddedError -> reducePointNotAddedError(
+            previousState
+        )
+        CounterResult.NoResult -> previousState
     }
 
-    private fun reduce(previousState: CounterViewState, result: CounterResult) =
-        when (result) {
-            is CounterResult.AddPointsResult.PointsAdded -> reduceAddPointToTeam(
-                previousState,
-                result
-            )
-            CounterResult.AddPointsResult.PointNotAddedError -> previousState
-        }
+    override suspend fun onNewState(state: CounterViewState) {
+        statesChannel.send(state)
+    }
 
-    private fun reduceAddPointToTeam(
+    private fun reducePointsAdded(
         previousState: CounterViewState,
         result: CounterResult.AddPointsResult.PointsAdded
-    ) =
-        when (result.team) {
-            is Team.A -> previousState.copy(
-                isLoading = false,
-                teamAPoints = previousState.teamAPoints + result.points
-            )
-            is Team.B -> previousState.copy(
-                isLoading = false,
-                teamBPoints = previousState.teamBPoints + result.points
-            )
-        }
+    ) = when (result.team) {
+        is Team.A -> previousState.copy(
+            isLoading = false,
+            teamAPoints = previousState.teamAPoints + result.points
+        )
+        is Team.B -> previousState.copy(
+            isLoading = false,
+            teamBPoints = previousState.teamBPoints + result.points
+        )
+    }
+
+    private fun reducePointNotAddedError(previousState: CounterViewState) = previousState
 }

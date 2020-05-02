@@ -15,6 +15,7 @@ sealed class CounterIntent : Intent {
 }
 
 sealed class CounterAction : Action {
+    object None : CounterAction()
     data class AddPointsToTeam(val points: Int, val team: Team) : CounterAction()
     object ClearTeamPoints : CounterAction()
 }
@@ -28,6 +29,8 @@ data class CounterViewState(
 
 
 sealed class CounterResult : Result {
+
+    object NoResult: CounterResult()
 
     sealed class AddPointsResult: CounterResult() {
         data class PointsAdded(val points: Int, val team: Team) : AddPointsResult()
