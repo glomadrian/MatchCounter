@@ -1,37 +1,87 @@
 package com.github.glomadrian.counter
 
-import android.util.Log
+import com.github.glomadrian.background
+import com.github.glomadrian.domain.AddPointsToTeam
+import com.github.glomadrian.domain.Team
 import com.github.glomadrian.exhaustive
-import com.github.glomadrian.mainThread
 import com.github.glomadrian.mvi.ViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.transform
 
-class CounterViewModel : ViewModel<CounterIntent, CounterViewState> {
+class CounterViewModel(
+    private val addPointsToTeam: AddPointsToTeam
+) : ViewModel<CounterIntent, CounterViewState> {
 
     private val statesChannel = Channel<CounterViewState>()
+    private var state = CounterViewState(false, 0, 0, null)
 
     override fun states() = statesChannel.consumeAsFlow()
 
     override fun processIntents(intents: Flow<CounterIntent>) {
-        GlobalScope.launch(mainThread) {
-            intents.collect {
-                when (it) {
-                    CounterIntent.InitView -> logIntent(it)
-                    is CounterIntent.AddOnePointToTeam -> logIntent(it)
-                    is CounterIntent.AddThreePointToTeam -> logIntent(it)
-                    is CounterIntent.AddFivePointToTeam -> logIntent(it)
-                    CounterIntent.ClearCounter -> logIntent(it)
-                }.exhaustive
+        intents.transform {
+            when (it) {
+                CounterIntent.InitView -> {
+                }
+                is CounterIntent.AddOnePointToTeam -> emit(
+                    CounterAction.AddPointsToTeam(
+                        1,
+                        it.team
+                    )
+                )
+                is CounterIntent.AddThreePointToTeam -> emit(
+                    CounterAction.AddPointsToTeam(
+                        3,
+                        it.team
+                    )
+                )
+                is CounterIntent.AddFivePointToTeam -> emit(
+                    CounterAction.AddPointsToTeam(
+                        5,
+                        it.team
+                    )
+                )
+                CounterIntent.ClearCounter -> emit(CounterAction.ClearTeamPoints)
+            }.exhaustive
+        }.flatMapConcat {
+            when (it) {
+                is CounterAction.AddPointsToTeam -> addPointsToTeam(it.points, it.team)
+                CounterAction.ClearTeamPoints -> addPointsToTeam(2, Team.A)
             }
-        }
+        }.scan(state) { acc, value ->
+            reduce(acc, value)
+        }.distinctUntilChanged()
+            .flowOn(background)
+            .onEach { statesChannel.send(it) }
+            .launchIn(GlobalScope)
     }
 
-    private fun logIntent(intent: CounterIntent) {
-        Log.d("Intent", intent.toString())
-    }
+    private fun reduce(previousState: CounterViewState, result: AddPointsToTeam.Result) =
+        when (result) {
+            is AddPointsToTeam.Result.PointsAdded -> reduceAddPointToTeam(previousState, result)
+            AddPointsToTeam.Result.PointNotAddedError -> previousState
+        }
+
+    private fun reduceAddPointToTeam(
+        previousState: CounterViewState,
+        result: AddPointsToTeam.Result.PointsAdded
+    ) =
+        when (result.team) {
+            is Team.A -> previousState.copy(
+                isLoading = false,
+                teamAPoints = previousState.teamAPoints + result.points
+            )
+            is Team.B -> previousState.copy(
+                isLoading = false,
+                teamBPoints = previousState.teamBPoints + result.points
+            )
+        }
 }

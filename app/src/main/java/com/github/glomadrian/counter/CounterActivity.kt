@@ -2,101 +2,55 @@ package com.github.glomadrian.counter
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatButton
-import com.github.glomadrian.R
+import com.github.glomadrian.CounterMemoryDataSource
+import com.github.glomadrian.CounterRepository
+import com.github.glomadrian.clicks
+import com.github.glomadrian.databinding.ActivityMainBinding
+import com.github.glomadrian.domain.AddPointsToTeam
 import com.github.glomadrian.domain.Team
 import com.github.glomadrian.mainThread
 import com.github.glomadrian.mvi.View
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 
 class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterIntent> {
 
     private val feedViewModel by lazy {
-        CounterViewModel()
+        CounterViewModel(
+            AddPointsToTeam(
+                CounterRepository(CounterMemoryDataSource)
+            )
+        )
     }
-    private val resetCounterButton by lazy {
-        findViewById<AppCompatButton>(R.id.addMovie)
-    }
-    private val addOnePointTeamA by lazy {
-        findViewById<AppCompatButton>(R.id.addOnePointTeamA)
-    }
-    private val addThreePointTeamA by lazy {
-        findViewById<AppCompatButton>(R.id.addThreePointTeamA)
-    }
-    private val addFivePointTeamA by lazy {
-        findViewById<AppCompatButton>(R.id.addFivePointTeamA)
-    }
-    private val addOnePointTeamB by lazy {
-        findViewById<AppCompatButton>(R.id.addOnePointTeamB)
-    }
-    private val addThreePointTeamB by lazy {
-        findViewById<AppCompatButton>(R.id.addThreePointTeamB)
-    }
-    private val addFivePointTeamB by lazy {
-        findViewById<AppCompatButton>(R.id.addFivePointTeamB)
-    }
-    private val intentChannel = Channel<CounterIntent>()
+    private lateinit var binding: ActivityMainBinding
 
-    /**
-     *  Channel that emits all intent as a flow
-     *  this could be abstract for every view
-     */
-    override fun intents() = intentChannel.consumeAsFlow()
+    override fun intents() = merge(
+        flowOf(CounterIntent.InitView),
+        binding.addMovie.clicks().map { CounterIntent.ClearCounter },
+        binding.addOnePointTeamA.clicks().map { CounterIntent.AddOnePointToTeam(Team.A) },
+        binding.addThreePointTeamA.clicks().map { CounterIntent.AddThreePointToTeam(Team.A) },
+        binding.addFivePointTeamA.clicks().map { CounterIntent.AddFivePointToTeam(Team.A) },
+        binding.addOnePointTeamB.clicks().map { CounterIntent.AddOnePointToTeam(Team.B) },
+        binding.addThreePointTeamB.clicks().map { CounterIntent.AddThreePointToTeam(Team.B) },
+        binding.addFivePointTeamB.clicks().map { CounterIntent.AddFivePointToTeam(Team.B) }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        bind()
-    }
-
-    private fun bind() {
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         feedViewModel.processIntents(intents())
-        onViewReady()
-        listeners()
-    }
-
-    private fun onViewReady() {
-        sendIntent(CounterIntent.InitView)
-    }
-
-    private fun listeners() {
-        resetCounterButton.setOnClickListener {
-            sendIntent(CounterIntent.ClearCounter)
-        }
-        addOnePointTeamA.setOnClickListener {
-            sendIntent(CounterIntent.AddOnePointToTeam(Team.A))
-        }
-        addThreePointTeamA.setOnClickListener {
-            sendIntent(CounterIntent.AddThreePointToTeam(Team.A))
-        }
-        addFivePointTeamA.setOnClickListener {
-            sendIntent(CounterIntent.AddFivePointToTeam(Team.A))
-        }
-        addOnePointTeamB.setOnClickListener {
-            sendIntent(CounterIntent.AddOnePointToTeam(Team.B))
-        }
-        addThreePointTeamB.setOnClickListener {
-            sendIntent(CounterIntent.AddThreePointToTeam(Team.B))
-        }
-        addFivePointTeamB.setOnClickListener {
-            sendIntent(CounterIntent.AddFivePointToTeam(Team.B))
-        }
+        feedViewModel.states().onEach { render(it) }.flowOn(mainThread).launchIn(GlobalScope)
     }
 
 
     override fun render(state: CounterViewState) {
-        TODO("Not yet implemented")
-    }
-
-    /**
-     * This could be abstract
-     */
-    private fun sendIntent(intent: CounterIntent) {
-        GlobalScope.launch(mainThread) {
-            intentChannel.send(intent)
-        }
+        binding.teamAPoints.text = state.teamAPoints.toString()
+        binding.teamBPoints.text = state.teamBPoints.toString()
     }
 }
