@@ -4,5 +4,4 @@ import kotlinx.coroutines.flow.Flow
 
 interface View<S: State, I: Intent> {
     fun intents(): Flow<I>
-    fun render(state: S)
 }

@@ -1,20 +1,14 @@
 package com.github.glomadrian.counter
 
+import androidx.lifecycle.ViewModelProvider
 import com.github.glomadrian.domain.AddPointsToTeam
 import com.github.glomadrian.domain.Team
 import com.github.glomadrian.mvi.ViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
 
 class CounterViewModel(
     private val addPointsToTeam: AddPointsToTeam
 ) : ViewModel<CounterIntent, CounterViewState, CounterAction, CounterResult>() {
-
-    private val statesChannel = Channel<CounterViewState>()
-    override var state = CounterViewState(false, 0, 0, null)
-
-    override fun states() = statesChannel.consumeAsFlow()
 
     override suspend fun intentToActionMatcher(intent: CounterIntent) =
         when (intent) {
@@ -46,10 +40,6 @@ class CounterViewModel(
         CounterResult.NoResult -> previousState
     }
 
-    override suspend fun onNewState(state: CounterViewState) {
-        statesChannel.send(state)
-    }
-
     private fun reducePointsAdded(
         previousState: CounterViewState,
         result: CounterResult.AddPointsResult.PointsAdded
@@ -65,4 +55,13 @@ class CounterViewModel(
     }
 
     private fun reducePointNotAddedError(previousState: CounterViewState) = previousState
+
+    class Factory(
+        private val addPointsToTeam: AddPointsToTeam
+    ) : ViewModelProvider.Factory {
+        override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
+            CounterViewModel(addPointsToTeam) as T
+    }
+
+    override fun initialState() = CounterViewState(false, 0, 0, null)
 }

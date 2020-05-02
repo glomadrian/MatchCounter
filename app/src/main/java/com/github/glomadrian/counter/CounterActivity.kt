@@ -2,31 +2,32 @@ package com.github.glomadrian.counter
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.github.glomadrian.CounterMemoryDataSource
 import com.github.glomadrian.CounterRepository
 import com.github.glomadrian.clicks
 import com.github.glomadrian.databinding.ActivityMainBinding
 import com.github.glomadrian.domain.AddPointsToTeam
 import com.github.glomadrian.domain.Team
-import com.github.glomadrian.mainThread
 import com.github.glomadrian.mvi.View
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 
 class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterIntent> {
 
-    private val feedViewModel by lazy {
-        CounterViewModel(
-            AddPointsToTeam(
-                CounterRepository(CounterMemoryDataSource)
+    private val feedViewModel: CounterViewModel by lazy {
+        ViewModelProvider(
+            this,
+            CounterViewModel.Factory(
+                AddPointsToTeam(
+                    CounterRepository(CounterMemoryDataSource)
+                )
             )
-        )
+        ).get(CounterViewModel::class.java)
     }
+
     private lateinit var binding: ActivityMainBinding
 
     override fun intents() = merge(
@@ -45,12 +46,11 @@ class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterInten
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         feedViewModel.processIntents(intents())
-        feedViewModel.states().onEach { render(it) }.flowOn(mainThread).launchIn(GlobalScope)
+        feedViewModel.state().observe(this, stateObserver())
     }
 
-
-    override fun render(state: CounterViewState) {
-        binding.teamAPoints.text = state.teamAPoints.toString()
-        binding.teamBPoints.text = state.teamBPoints.toString()
+    private fun stateObserver() = Observer<CounterViewState> {
+        binding.teamAPoints.text = it.teamAPoints.toString()
+        binding.teamBPoints.text = it.teamBPoints.toString()
     }
 }
