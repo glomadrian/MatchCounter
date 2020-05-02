@@ -64,15 +64,18 @@ class CounterViewModel(
             .launchIn(GlobalScope)
     }
 
-    private fun reduce(previousState: CounterViewState, result: AddPointsToTeam.Result) =
+    private fun reduce(previousState: CounterViewState, result: CounterResult) =
         when (result) {
-            is AddPointsToTeam.Result.PointsAdded -> reduceAddPointToTeam(previousState, result)
-            AddPointsToTeam.Result.PointNotAddedError -> previousState
+            is CounterResult.AddPointsResult.PointsAdded -> reduceAddPointToTeam(
+                previousState,
+                result
+            )
+            CounterResult.AddPointsResult.PointNotAddedError -> previousState
         }
 
     private fun reduceAddPointToTeam(
         previousState: CounterViewState,
-        result: AddPointsToTeam.Result.PointsAdded
+        result: CounterResult.AddPointsResult.PointsAdded
     ) =
         when (result.team) {
             is Team.A -> previousState.copy(
