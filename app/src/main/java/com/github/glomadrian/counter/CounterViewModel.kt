@@ -1,5 +1,6 @@
 package com.github.glomadrian.counter
 
+import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import com.github.glomadrian.domain.AddPointsToTeam
 import com.github.glomadrian.domain.ClearCounter
@@ -30,6 +31,8 @@ class CounterViewModel(
             )
             CounterAction.ClearTeamPoints -> clearCounter().onStart { emit(CounterResult.Loading) }
             CounterAction.None -> flow { emit(CounterResult.NoResult) }
+        }.also {
+            Log.d("MVI", "${Thread.currentThread().name}")
         }
 
     override fun reduceMatcher(
@@ -37,12 +40,12 @@ class CounterViewModel(
         result: CounterResult
     ) = when (result) {
         is CounterResult.AddPointsResult.PointsAdded -> reducePointsAdded(previousState, result)
-        is CounterResult.AddPointsResult.PointNotAddedError -> reducePointNotAddedError(
+        is CounterResult.AddPointsResult.PointNotAddedError -> pointNotAddedErrorReducer(
             previousState
         )
         CounterResult.NoResult -> previousState
         CounterResult.CounterCleared -> initialState()
-        CounterResult.Loading ->  reduceLoading(previousState)
+        CounterResult.Loading ->  loadingReducer(previousState)
     }
 
     private fun reducePointsAdded(
@@ -59,9 +62,9 @@ class CounterViewModel(
         )
     }
 
-    private fun reducePointNotAddedError(previousState: CounterViewState) = previousState
+    private fun pointNotAddedErrorReducer(previousState: CounterViewState) = previousState
 
-    private fun reduceLoading(previousState: CounterViewState) = previousState.copy(isLoading =  true)
+    private fun loadingReducer(previousState: CounterViewState) = previousState.copy(isLoading =  true)
 
     class Factory(
         private val addPointsToTeam: AddPointsToTeam,
@@ -73,4 +76,7 @@ class CounterViewModel(
 
     override fun initialState()
         = CounterViewState(false, 0, 0, null)
+
+    override fun errorReducer(previousState: CounterViewState, error: Throwable) =
+        previousState.copy(error = error, isLoading = false)
 }

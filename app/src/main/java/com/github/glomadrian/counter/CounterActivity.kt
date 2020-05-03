@@ -3,6 +3,7 @@ package com.github.glomadrian.counter
 import android.os.Bundle
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -56,6 +57,9 @@ class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterInten
             binding.loading.visibility = VISIBLE
         } else {
             binding.loading.visibility = INVISIBLE
+        }
+        it.error?.run {
+            Toast.makeText(this@CounterActivity, it.error.message, Toast.LENGTH_SHORT).show()
         }
     }
 }

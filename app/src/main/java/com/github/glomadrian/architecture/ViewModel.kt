@@ -1,15 +1,17 @@
 package com.github.glomadrian.architecture
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.glomadrian.background
-import com.github.glomadrian.mainThread
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -24,13 +26,17 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> : ViewMo
         intents
             .map { intentToActionMatcher(it) }
             .flatMapMerge { actionExecutor(it) }
-            .catch { onUnexpectedError(it) }
             .scan(currentStateOrDefault()) { acc, value -> reduceMatcher(acc, value) }
             .distinctUntilChanged()
+            .catch {error ->
+                 emit(errorReducer(currentStateOrDefault(), error))
+            }
             .flowOn(background)
             .onEach { stateLiveData.value = it }
-            .flowOn(mainThread)
             .launchIn(viewModelScope)
+            .invokeOnCompletion {
+                Log.d("MVI", "COMPLETE")
+            }
     }
 
     private fun currentStateOrDefault() = stateLiveData.value ?: initialState()
@@ -45,5 +51,5 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> : ViewMo
 
     abstract fun initialState(): S
 
-    abstract fun onUnexpectedError(error: Throwable)
+    abstract fun errorReducer(previousState: S, error: Throwable): S
 }
