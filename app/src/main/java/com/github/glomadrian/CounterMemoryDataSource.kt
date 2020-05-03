@@ -20,6 +20,7 @@ object CounterMemoryDataSource {
     }
 
     fun clear() = flow {
+        kotlinx.coroutines.delay(3000)
         teamAPoints = 0
         teamBPoints = 0
         emit(Unit)

@@ -3,19 +3,19 @@ package com.github.glomadrian.architecture
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.glomadrian.background
 import com.github.glomadrian.mainThread
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
 
-abstract class ViewModel<I : Intent, S : State, A : Action, R : Result>: ViewModel() {
+abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> : ViewModel() {
 
     private val stateLiveData: MutableLiveData<S> = MutableLiveData()
 
@@ -23,7 +23,7 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result>: ViewMod
         intents
             .map {
                 intentToActionMatcher(it)
-            }.flatMapConcat {
+            }.flatMapMerge {
                 actionExecutor(it)
             }.scan(currentStateOrDefault()) { acc, value ->
                 reduceMatcher(acc, value)
@@ -33,7 +33,7 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result>: ViewMod
             .onEach {
                 stateLiveData.value = it
             }.flowOn(mainThread)
-            .launchIn(GlobalScope)
+            .launchIn(viewModelScope)
     }
 
     private fun currentStateOrDefault() = stateLiveData.value ?: initialState()
