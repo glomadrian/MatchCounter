@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 
 class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterIntent> {
-
     private val feedViewModel: CounterViewModel by lazy {
         ViewModelProvider(
             this,

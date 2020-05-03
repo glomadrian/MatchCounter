@@ -19,15 +19,13 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result>: ViewMod
 
     private val stateLiveData: MutableLiveData<S> = MutableLiveData()
 
-    private var state: S = initialState()
-
     fun processIntents(intents: Flow<I>) {
         intents
             .map {
                 intentToActionMatcher(it)
             }.flatMapConcat {
                 actionExecutor(it)
-            }.scan(state) { acc, value ->
+            }.scan(currentStateOrDefault()) { acc, value ->
                 reduceMatcher(acc, value)
             }
             .distinctUntilChanged()
@@ -37,6 +35,8 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result>: ViewMod
             }.flowOn(mainThread)
             .launchIn(GlobalScope)
     }
+
+    private fun currentStateOrDefault() = stateLiveData.value ?: initialState()
 
     abstract suspend fun intentToActionMatcher(intent: I): A
 

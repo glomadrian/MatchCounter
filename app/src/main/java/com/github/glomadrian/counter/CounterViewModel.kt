@@ -63,5 +63,6 @@ class CounterViewModel(
             CounterViewModel(addPointsToTeam) as T
     }
 
-    override fun initialState() = CounterViewState(false, 0, 0, null)
+    override fun initialState()
+        = CounterViewState(false, 0, 0, null)
 }
