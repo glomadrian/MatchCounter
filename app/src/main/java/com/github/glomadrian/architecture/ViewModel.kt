@@ -1,4 +1,4 @@
-package com.github.glomadrian.mvi
+package com.github.glomadrian.architecture
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

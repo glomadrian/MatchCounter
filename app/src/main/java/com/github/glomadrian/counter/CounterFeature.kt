@@ -1,10 +1,10 @@
 package com.github.glomadrian.counter
 
 import com.github.glomadrian.domain.Team
-import com.github.glomadrian.mvi.Action
-import com.github.glomadrian.mvi.Intent
-import com.github.glomadrian.mvi.Result
-import com.github.glomadrian.mvi.State
+import com.github.glomadrian.architecture.Action
+import com.github.glomadrian.architecture.Intent
+import com.github.glomadrian.architecture.Result
+import com.github.glomadrian.architecture.State
 
 sealed class CounterIntent : Intent {
     object InitView : CounterIntent()
@@ -36,4 +36,6 @@ sealed class CounterResult : Result {
         data class PointsAdded(val points: Int, val team: Team) : AddPointsResult()
         object PointNotAddedError : AddPointsResult()
     }
+
+    object CounterCleared: CounterResult()
 }

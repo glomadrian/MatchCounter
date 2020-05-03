@@ -8,11 +8,20 @@ object CounterMemoryDataSource {
 
     fun addPointsToTeamA(points: Int) = flow {
         teamAPoints += points
+        if (teamAPoints == 10) {
+            throw IllegalAccessError()
+        }
         emit(Unit)
     }
 
     fun addPointsToTeamB(points: Int) = flow {
         teamBPoints += points
+        emit(Unit)
+    }
+
+    fun clear() = flow {
+        teamAPoints = 0
+        teamBPoints = 0
         emit(Unit)
     }
 }

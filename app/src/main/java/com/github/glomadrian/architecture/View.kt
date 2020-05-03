@@ -1,4 +1,4 @@
-package com.github.glomadrian.mvi
+package com.github.glomadrian.architecture
 
 import kotlinx.coroutines.flow.Flow
 

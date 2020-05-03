@@ -9,20 +9,19 @@ import com.github.glomadrian.CounterRepository
 import com.github.glomadrian.clicks
 import com.github.glomadrian.databinding.ActivityMainBinding
 import com.github.glomadrian.domain.AddPointsToTeam
+import com.github.glomadrian.domain.ClearCounter
 import com.github.glomadrian.domain.Team
-import com.github.glomadrian.mvi.View
+import com.github.glomadrian.architecture.View
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 
 class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterIntent> {
     private val feedViewModel: CounterViewModel by lazy {
+        val repository = CounterRepository(CounterMemoryDataSource)
         ViewModelProvider(
             this,
-            CounterViewModel.Factory(
-                AddPointsToTeam(
-                    CounterRepository(CounterMemoryDataSource)
-                )
+            CounterViewModel.Factory(AddPointsToTeam(repository),ClearCounter(repository)
             )
         ).get(CounterViewModel::class.java)
     }
