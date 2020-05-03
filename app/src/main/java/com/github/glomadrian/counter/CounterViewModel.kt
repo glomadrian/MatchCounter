@@ -6,6 +6,7 @@ import com.github.glomadrian.domain.ClearCounter
 import com.github.glomadrian.domain.Team
 import com.github.glomadrian.architecture.ViewModel
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 
 class CounterViewModel(
     private val addPointsToTeam: AddPointsToTeam,
@@ -27,7 +28,7 @@ class CounterViewModel(
                 counterAction.points,
                 counterAction.team
             )
-            CounterAction.ClearTeamPoints -> clearCounter()
+            CounterAction.ClearTeamPoints -> clearCounter().onStart { emit(CounterResult.Loading) }
             CounterAction.None -> flow { emit(CounterResult.NoResult) }
         }
 
@@ -41,6 +42,7 @@ class CounterViewModel(
         )
         CounterResult.NoResult -> previousState
         CounterResult.CounterCleared -> initialState()
+        CounterResult.Loading ->  reduceLoading(previousState)
     }
 
     private fun reducePointsAdded(
@@ -58,6 +60,8 @@ class CounterViewModel(
     }
 
     private fun reducePointNotAddedError(previousState: CounterViewState) = previousState
+
+    private fun reduceLoading(previousState: CounterViewState) = previousState.copy(isLoading =  true)
 
     class Factory(
         private val addPointsToTeam: AddPointsToTeam,

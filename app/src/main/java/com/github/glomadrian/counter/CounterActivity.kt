@@ -1,6 +1,8 @@
 package com.github.glomadrian.counter
 
 import android.os.Bundle
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -50,5 +52,10 @@ class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterInten
     private fun stateObserver() = Observer<CounterViewState> {
         binding.teamAPoints.text = it.teamAPoints.toString()
         binding.teamBPoints.text = it.teamBPoints.toString()
+        if (it.isLoading) {
+            binding.loading.visibility = VISIBLE
+        } else {
+            binding.loading.visibility = INVISIBLE
+        }
     }
 }
