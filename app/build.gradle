@@ -25,6 +25,13 @@ android {
     viewBinding {
         enabled = true
     }
+
+    kotlinOptions {
+        freeCompilerArgs += [
+                '-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi',
+                '-Xuse-experimental=kotlinx.coroutines.ObsoleteCoroutinesApi'
+        ]
+    }
 }
 
 dependencies {

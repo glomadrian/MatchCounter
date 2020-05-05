@@ -6,13 +6,40 @@ import com.github.glomadrian.domain.AddPointsToTeam
 import com.github.glomadrian.domain.ClearCounter
 import com.github.glomadrian.domain.Team
 import com.github.glomadrian.architecture.ViewModel
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.runBlocking
 
 class CounterViewModel(
     private val addPointsToTeam: AddPointsToTeam,
     private val clearCounter: ClearCounter
 ) : ViewModel<CounterIntent, CounterViewState, CounterAction, CounterResult>() {
+
+    init {
+        runBlocking {
+            flow {
+                throw IllegalArgumentException()
+                emit("asd")
+            }.catch {
+                Log.d("MVI","Crash")
+                emit("crash")
+            }.collect {
+                Log.d("MVI",it)
+            }
+            // clearCounter()
+            //     .catch {
+            //         Log.d("MVI","Crash")
+            //         emit(CounterResult.Loading)
+            //     }
+            //     .collect {
+            //
+            //     }
+        }
+
+    }
 
     override suspend fun intentToActionMatcher(intent: CounterIntent) =
         when (intent) {
@@ -29,11 +56,22 @@ class CounterViewModel(
                 counterAction.points,
                 counterAction.team
             )
-            CounterAction.ClearTeamPoints -> clearCounter().onStart { emit(CounterResult.Loading) }
+            CounterAction.ClearTeamPoints -> clearCounterAction()
             CounterAction.None -> flow { emit(CounterResult.NoResult) }
-        }.also {
-            Log.d("MVI", "${Thread.currentThread().name}")
         }
+
+    private fun clearCounterAction() = clearCounter()
+        .catch {
+            Log.d("MVI", "Clear counter error")
+        }
+        .retry(3) {
+            Log.d("MVI", "Retry clear counter")
+            it is IllegalArgumentException
+        }
+        .onStart {
+            emit(CounterResult.Loading)
+        }
+
 
     override fun reduceMatcher(
         previousState: CounterViewState,
