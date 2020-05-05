@@ -1,5 +1,6 @@
 package com.github.glomadrian.architecture
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,8 +27,7 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> : ViewMo
             .scan(currentStateOrDefault()) { acc, value -> reduceMatcher(acc, value) }
             .distinctUntilChanged()
             .catch { error ->
-                emit(errorReducer(currentStateOrDefault(), error))
-                processIntents(intents)
+                emit(genericErrorReducer(currentStateOrDefault(), error))
             }
             .flowOn(background)
             .onEach { stateLiveData.value = it }
@@ -46,5 +46,5 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> : ViewMo
 
     abstract fun initialState(): S
 
-    abstract fun errorReducer(previousState: S, error: Throwable): S
+    abstract fun genericErrorReducer(previousState: S, error: Throwable): S
 }

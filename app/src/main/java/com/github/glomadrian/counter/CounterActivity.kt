@@ -59,7 +59,7 @@ class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterInten
             binding.loading.visibility = INVISIBLE
         }
         it.error?.run {
-            Toast.makeText(this@CounterActivity, it.error.message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@CounterActivity, it.toString(), Toast.LENGTH_SHORT).show()
         }
     }
 }

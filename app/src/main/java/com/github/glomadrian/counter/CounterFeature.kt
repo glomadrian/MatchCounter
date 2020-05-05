@@ -33,6 +33,7 @@ sealed class CounterResult : Result {
         data class PointsAdded(val points: Int, val team: Team) : AddPointsResult()
         object PointNotAddedError : AddPointsResult()
     }
+    data class CounterClearedError(val error: Throwable) : CounterResult()
     object CounterCleared : CounterResult()
     object Loading : CounterResult()
 }
