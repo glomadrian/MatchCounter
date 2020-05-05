@@ -1,11 +1,11 @@
 package com.github.glomadrian.counter
 
-import android.util.Log
 import androidx.lifecycle.ViewModelProvider
+import com.github.glomadrian.architecture.ViewModel
 import com.github.glomadrian.domain.AddPointsToTeam
 import com.github.glomadrian.domain.ClearCounter
 import com.github.glomadrian.domain.Team
-import com.github.glomadrian.architecture.ViewModel
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 
@@ -29,10 +29,15 @@ class CounterViewModel(
                 counterAction.points,
                 counterAction.team
             )
-            CounterAction.ClearTeamPoints -> clearCounter().onStart { emit(CounterResult.Loading) }
+            CounterAction.ClearTeamPoints -> clearCounterAction()
             CounterAction.None -> flow { emit(CounterResult.NoResult) }
-        }.also {
-            Log.d("MVI", "${Thread.currentThread().name}")
+        }
+
+    private fun clearCounterAction() = clearCounter()
+        .catch {
+            emit(CounterResult.CounterClearedError(it))
+        }.onStart {
+            emit(CounterResult.Loading)
         }
 
     override fun reduceMatcher(
@@ -45,8 +50,15 @@ class CounterViewModel(
         )
         CounterResult.NoResult -> previousState
         CounterResult.CounterCleared -> initialState()
-        CounterResult.Loading ->  loadingReducer(previousState)
+        is CounterResult.CounterClearedError -> counterClearedErrorReducer(
+            previousState,
+            result.error
+        )
+        CounterResult.Loading -> loadingReducer(previousState)
     }
+
+    private fun counterClearedErrorReducer(previousState: CounterViewState, error: Throwable) =
+        previousState.copy(error = error, isLoading = false)
 
     private fun reducePointsAdded(
         previousState: CounterViewState,
@@ -64,7 +76,8 @@ class CounterViewModel(
 
     private fun pointNotAddedErrorReducer(previousState: CounterViewState) = previousState
 
-    private fun loadingReducer(previousState: CounterViewState) = previousState.copy(isLoading =  true)
+    private fun loadingReducer(previousState: CounterViewState) =
+        previousState.copy(isLoading = true)
 
     class Factory(
         private val addPointsToTeam: AddPointsToTeam,
@@ -74,9 +87,8 @@ class CounterViewModel(
             CounterViewModel(addPointsToTeam, clearCounter) as T
     }
 
-    override fun initialState()
-        = CounterViewState(false, 0, 0, null)
+    override fun initialState() = CounterViewState(false, 0, 0, null)
 
-    override fun errorReducer(previousState: CounterViewState, error: Throwable) =
+    override fun genericErrorReducer(previousState: CounterViewState, error: Throwable) =
         previousState.copy(error = error, isLoading = false)
 }
