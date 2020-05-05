@@ -29,7 +29,7 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> : ViewMo
             .scan(currentStateOrDefault()) { acc, value -> reduceMatcher(acc, value) }
             .distinctUntilChanged()
             .catch {error ->
-                 emit(errorReducer(currentStateOrDefault(), error))
+                 emit(errorRegducer(currentStateOrDefault(), error))
             }
             .flowOn(background)
             .onEach { stateLiveData.value = it }
