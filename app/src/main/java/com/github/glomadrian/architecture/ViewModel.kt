@@ -15,18 +15,21 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
 
-abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> : ViewModel() {
+abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> (
+    private val actionExecutor: ActionExecutor<A, R>,
+    private val reducerHandler: Reducer<R, S>
+): ViewModel() {
 
     private val stateLiveData: MutableLiveData<S> = MutableLiveData()
 
     fun processIntents(intents: Flow<I>) {
         intents
-            .map { intentToActionMatcher(it) }
+            .map { handleIntent(it) }
             .flatMapMerge { actionExecutor(it) }
-            .scan(currentStateOrDefault()) { acc, value -> reduceMatcher(acc, value) }
+            .scan(currentStateOrDefault()) { acc, value -> reducerHandler.reduce(acc, value) }
             .distinctUntilChanged()
             .catch { error ->
-                emit(genericErrorReducer(currentStateOrDefault(), error))
+                emit(reducerHandler.reduceUnexpectedError(currentStateOrDefault(), error))
             }
             .flowOn(background)
             .onEach { stateLiveData.value = it }
@@ -35,15 +38,9 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> : ViewMo
 
     private fun currentStateOrDefault() = stateLiveData.value ?: initialState()
 
-    abstract suspend fun intentToActionMatcher(intent: I): A
-
-    abstract fun actionExecutor(counterAction: A): Flow<R>
-
-    abstract fun reduceMatcher(previousState: S, result: R): S
+    abstract suspend fun handleIntent(intent: I): A
 
     fun state(): LiveData<S> = stateLiveData
 
     abstract fun initialState(): S
-
-    abstract fun genericErrorReducer(previousState: S, error: Throwable): S
 }
