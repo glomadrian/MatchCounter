@@ -1,6 +1,7 @@
 package com.github.glomadrian
 
 import kotlinx.coroutines.Dispatchers
+import kotlin.coroutines.CoroutineContext
 
-val background = Dispatchers.Default
-val mainThread = Dispatchers.Main
+var background: CoroutineContext = Dispatchers.Default
+var mainThread: CoroutineContext = Dispatchers.Main

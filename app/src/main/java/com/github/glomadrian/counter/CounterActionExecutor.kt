@@ -1,5 +1,6 @@
 package com.github.glomadrian.counter
 
+import android.util.Log
 import com.github.glomadrian.architecture.ActionExecutor
 import com.github.glomadrian.domain.AddPointsToTeam
 import com.github.glomadrian.domain.ClearCounter
@@ -18,7 +19,9 @@ class CounterActionExecutor(
             is CounterAction.AddPointsToTeam -> addPointsToTeam(
                 action.points,
                 action.team
-            )
+            ).catch {
+                Log.d("MVI", "Add Point Catch")
+            }
             CounterAction.ClearTeamPoints -> clearCounterAction()
             CounterAction.None -> flow { emit(CounterResult.NoResult) }
         }

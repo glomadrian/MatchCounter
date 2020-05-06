@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.scan
 
 abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> (
     private val actionExecutor: ActionExecutor<A, R>,
-    private val reducerHandler: Reducer<R, S>
+    private val reducer: Reducer<R, S>
 ): ViewModel() {
 
     private val stateLiveData: MutableLiveData<S> = MutableLiveData()
@@ -26,10 +26,10 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> (
         intents
             .map { handleIntent(it) }
             .flatMapMerge { actionExecutor(it) }
-            .scan(currentStateOrDefault()) { acc, value -> reducerHandler.reduce(acc, value) }
+            .scan(currentStateOrDefault()) { acc, value -> reducer.reduce(acc, value) }
             .distinctUntilChanged()
             .catch { error ->
-                emit(reducerHandler.reduceUnexpectedError(currentStateOrDefault(), error))
+                emit(reducer.reduceUnexpectedError(currentStateOrDefault(), error))
             }
             .flowOn(background)
             .onEach { stateLiveData.value = it }
