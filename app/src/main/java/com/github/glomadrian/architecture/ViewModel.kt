@@ -30,6 +30,7 @@ abstract class ViewModel<I : Intent, S : State, A : Action, R : Result> (
             .distinctUntilChanged()
             .catch { error ->
                 emit(reducer.reduceUnexpectedError(currentStateOrDefault(), error))
+                processIntents(intents)
             }
             .flowOn(background)
             .onEach { stateLiveData.value = it }
