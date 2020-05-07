@@ -9,12 +9,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.github.glomadrian.CounterMemoryDataSource
 import com.github.glomadrian.CounterRepository
+import com.github.glomadrian.architecture.View
 import com.github.glomadrian.clicks
 import com.github.glomadrian.databinding.ActivityMainBinding
 import com.github.glomadrian.domain.AddPointsToTeam
 import com.github.glomadrian.domain.ClearCounter
 import com.github.glomadrian.domain.Team
-import com.github.glomadrian.architecture.View
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -24,7 +24,9 @@ class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterInten
         val repository = CounterRepository(CounterMemoryDataSource)
         ViewModelProvider(
             this,
-            CounterViewModel.Factory(AddPointsToTeam(repository),ClearCounter(repository)
+            CounterViewModel.Factory(
+                CounterActionExecutor(AddPointsToTeam(repository), ClearCounter(repository)),
+                CounterReducer()
             )
         ).get(CounterViewModel::class.java)
     }

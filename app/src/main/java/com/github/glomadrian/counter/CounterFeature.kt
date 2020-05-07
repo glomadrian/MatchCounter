@@ -21,9 +21,9 @@ sealed class CounterAction : Action {
 }
 
 data class CounterViewState(
-    val isLoading: Boolean,
-    val teamAPoints: Int,
-    val teamBPoints: Int,
+    val isLoading: Boolean = false,
+    val teamAPoints: Int = 0,
+    val teamBPoints: Int = 0,
     val error: Throwable?
 ) : State
 
