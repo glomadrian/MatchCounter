@@ -13,6 +13,7 @@ import com.github.glomadrian.architecture.View
 import com.github.glomadrian.clicks
 import com.github.glomadrian.databinding.ActivityMainBinding
 import com.github.glomadrian.domain.AddPointsToTeam
+import com.github.glomadrian.domain.AddPointsToTeamMiddleware
 import com.github.glomadrian.domain.ClearCounter
 import com.github.glomadrian.domain.Team
 import kotlinx.coroutines.flow.flowOf
@@ -25,8 +26,8 @@ class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterInten
         ViewModelProvider(
             this,
             CounterViewModel.Factory(
-                CounterActionExecutor(AddPointsToTeam(repository), ClearCounter(repository)),
-                CounterReducer()
+                CounterReducer(),
+                listOf(AddPointsToTeamMiddleware(repository))
             )
         ).get(CounterViewModel::class.java)
     }

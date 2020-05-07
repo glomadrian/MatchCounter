@@ -2,14 +2,16 @@ package com.github.glomadrian.counter
 
 import androidx.lifecycle.ViewModelProvider
 import com.github.glomadrian.architecture.ActionExecutor
+import com.github.glomadrian.architecture.Middleware
 import com.github.glomadrian.architecture.Reducer
 import com.github.glomadrian.architecture.ViewModel
 
 class CounterViewModel(
-    actionExecutor: ActionExecutor<CounterAction, CounterResult>,
-    reducerHandler: Reducer<CounterResult, CounterViewState>
+    reducerHandler: Reducer<CounterResult, CounterViewState>,
+    middleware: List<Middleware<CounterAction, CounterResult>>
 ) : ViewModel<CounterIntent, CounterViewState, CounterAction, CounterResult>(
-    actionExecutor, reducerHandler) {
+    reducerHandler, middleware
+) {
 
     override suspend fun handleIntent(intent: CounterIntent) =
         when (intent) {
@@ -23,10 +25,10 @@ class CounterViewModel(
     override fun initialState() = CounterViewState(false, 0, 0, null)
 
     class Factory(
-        private val actionExecutor: ActionExecutor<CounterAction, CounterResult>,
-        private val reducerHandler: Reducer<CounterResult, CounterViewState>
+        private val reducerHandler: Reducer<CounterResult, CounterViewState>,
+        private val middleware: List<Middleware<CounterAction, CounterResult>>
     ) : ViewModelProvider.Factory {
         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
-            CounterViewModel(actionExecutor, reducerHandler) as T
+            CounterViewModel(reducerHandler, middleware) as T
     }
 }

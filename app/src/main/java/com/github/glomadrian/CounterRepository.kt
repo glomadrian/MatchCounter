@@ -1,7 +1,6 @@
 package com.github.glomadrian
 
 import com.github.glomadrian.domain.Team
-import kotlinx.coroutines.flow.Flow
 
 class CounterRepository(
     private val memoryDataSource: CounterMemoryDataSource
