@@ -5,6 +5,7 @@ import com.github.glomadrian.architecture.Middleware
 import com.github.glomadrian.counter.CounterAction
 import com.github.glomadrian.counter.CounterResult
 import com.github.glomadrian.counter.model.Team
+import com.github.glomadrian.ofType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
@@ -16,8 +17,7 @@ class AddPointsToTeam(
 ) : Middleware<CounterAction, CounterResult> {
 
     override fun bind(actions: Flow<CounterAction>): Flow<CounterResult.AddPointsResult> = actions
-        .filter { it is CounterAction.AddPointsToTeam }
-        .map { it as CounterAction.AddPointsToTeam }
+        .ofType<CounterAction.AddPointsToTeam>()
         .flatMapConcat {
             addPointsToTeam(it.points, it.team)
         }
