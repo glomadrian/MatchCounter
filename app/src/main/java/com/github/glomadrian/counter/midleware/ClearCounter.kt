@@ -1,4 +1,4 @@
-package com.github.glomadrian.domain
+package com.github.glomadrian.counter.midleware
 
 import com.github.glomadrian.CounterRepository
 import com.github.glomadrian.architecture.Middleware

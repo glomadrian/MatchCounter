@@ -1,6 +1,6 @@
 package com.github.glomadrian
 
-import com.github.glomadrian.domain.Team
+import com.github.glomadrian.counter.model.Team
 
 class CounterRepository(
     private val memoryDataSource: CounterMemoryDataSource

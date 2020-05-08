@@ -13,9 +13,9 @@ import com.github.glomadrian.architecture.Store
 import com.github.glomadrian.architecture.View
 import com.github.glomadrian.clicks
 import com.github.glomadrian.databinding.ActivityMainBinding
-import com.github.glomadrian.domain.AddPointsToTeam
-import com.github.glomadrian.domain.ClearCounter
-import com.github.glomadrian.domain.Team
+import com.github.glomadrian.counter.midleware.AddPointsToTeam
+import com.github.glomadrian.counter.midleware.ClearCounter
+import com.github.glomadrian.counter.model.Team
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -42,10 +42,12 @@ class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterInten
         flowOf(CounterIntent.InitView),
         binding.addMovie.clicks().map { CounterIntent.ClearCounter },
         binding.addOnePointTeamA.clicks().map { CounterIntent.AddOnePointToTeam(Team.A) },
-        binding.addThreePointTeamA.clicks().map { CounterIntent.AddThreePointToTeam(Team.A) },
+        binding.addThreePointTeamA.clicks().map { CounterIntent.AddThreePointToTeam(
+            Team.A) },
         binding.addFivePointTeamA.clicks().map { CounterIntent.AddFivePointToTeam(Team.A) },
         binding.addOnePointTeamB.clicks().map { CounterIntent.AddOnePointToTeam(Team.B) },
-        binding.addThreePointTeamB.clicks().map { CounterIntent.AddThreePointToTeam(Team.B) },
+        binding.addThreePointTeamB.clicks().map { CounterIntent.AddThreePointToTeam(
+            Team.B) },
         binding.addFivePointTeamB.clicks().map { CounterIntent.AddFivePointToTeam(Team.B) }
     )
 

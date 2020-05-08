@@ -1,4 +1,4 @@
-package com.github.glomadrian.domain
+package com.github.glomadrian.counter.model
 
 sealed class Team {
     object A : Team()

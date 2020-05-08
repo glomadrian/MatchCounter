@@ -4,7 +4,7 @@ import com.github.glomadrian.architecture.Action
 import com.github.glomadrian.architecture.Intent
 import com.github.glomadrian.architecture.Result
 import com.github.glomadrian.architecture.State
-import com.github.glomadrian.domain.Team
+import com.github.glomadrian.counter.model.Team
 
 sealed class CounterIntent : Intent {
     object InitView : CounterIntent()

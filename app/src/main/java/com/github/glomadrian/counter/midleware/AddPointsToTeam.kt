@@ -1,9 +1,10 @@
-package com.github.glomadrian.domain
+package com.github.glomadrian.counter.midleware
 
 import com.github.glomadrian.CounterRepository
 import com.github.glomadrian.architecture.Middleware
 import com.github.glomadrian.counter.CounterAction
 import com.github.glomadrian.counter.CounterResult
+import com.github.glomadrian.counter.model.Team
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter

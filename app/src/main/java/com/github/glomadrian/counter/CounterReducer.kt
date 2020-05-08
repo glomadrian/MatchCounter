@@ -1,7 +1,7 @@
 package com.github.glomadrian.counter
 
 import com.github.glomadrian.architecture.Reducer
-import com.github.glomadrian.domain.Team
+import com.github.glomadrian.counter.model.Team
 
 class CounterReducer : Reducer<CounterResult, CounterViewState> {
     override fun reduce(previousState: CounterViewState, result: CounterResult) =

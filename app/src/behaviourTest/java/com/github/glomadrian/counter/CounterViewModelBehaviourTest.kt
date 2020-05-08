@@ -3,8 +3,8 @@ package com.github.glomadrian.counter
 import com.github.glomadrian.CounterMemoryDataSource
 import com.github.glomadrian.CounterRepository
 import com.github.glomadrian.ViewModelBehaviourTest
-import com.github.glomadrian.domain.AddPointsToTeam
-import com.github.glomadrian.domain.Team
+import com.github.glomadrian.counter.midleware.AddPointsToTeam
+import com.github.glomadrian.counter.model.Team
 import org.junit.Test
 
 class CounterViewModelBehaviourTest :
@@ -35,19 +35,6 @@ class CounterViewModelBehaviourTest :
         assertViewStatesReceived(
             initialState,
             initialState.copy(teamAPoints = 1)
-        )
-    }
-
-    @Test
-    fun `should render same state when the points are incremented to 10 but is dropped because is repeated`() {
-        whenViewEmitIntents {
-            emit(CounterIntent.AddFivePointToTeam(Team.A))
-            emit(CounterIntent.AddFivePointToTeam(Team.A))
-        }
-
-        assertViewStatesReceived(
-            initialState,
-            initialState.copy(teamAPoints = 5)
         )
     }
 }
