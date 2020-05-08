@@ -3,7 +3,9 @@ package com.github.glomadrian.counter
 import com.github.glomadrian.CounterMemoryDataSource
 import com.github.glomadrian.CounterRepository
 import com.github.glomadrian.ViewModelBehaviourTest
+import com.github.glomadrian.architecture.Store
 import com.github.glomadrian.counter.midleware.AddPointsToTeam
+import com.github.glomadrian.counter.midleware.ClearCounter
 import com.github.glomadrian.counter.model.Team
 import org.junit.Test
 
@@ -12,11 +14,15 @@ class CounterViewModelBehaviourTest :
 
     //Replace with injector
     val repository = CounterRepository(CounterMemoryDataSource)
+    val middlewares = listOf(
+        AddPointsToTeam(repository),
+        ClearCounter(repository)
+    )
+    val store = Store(CounterReducer(), middlewares, CounterViewState.initState())
 
     override val viewModel = CounterViewModel.Factory(
-        CounterReducer(),
-        listOf(AddPointsToTeam(repository))
-        ).create(CounterViewModel::class.java)
+        store
+    ).create(CounterViewModel::class.java)
     //Replace with injector
 
     private val initialState = CounterViewState(
