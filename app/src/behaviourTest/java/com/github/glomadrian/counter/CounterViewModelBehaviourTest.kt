@@ -4,8 +4,6 @@ import com.github.glomadrian.CounterMemoryDataSource
 import com.github.glomadrian.CounterRepository
 import com.github.glomadrian.ViewModelBehaviourTest
 import com.github.glomadrian.domain.AddPointsToTeam
-import com.github.glomadrian.domain.AddPointsToTeamMiddleware
-import com.github.glomadrian.domain.ClearCounter
 import com.github.glomadrian.domain.Team
 import org.junit.Test
 
@@ -17,7 +15,7 @@ class CounterViewModelBehaviourTest :
 
     override val viewModel = CounterViewModel.Factory(
         CounterReducer(),
-        listOf(AddPointsToTeamMiddleware(repository))
+        listOf(AddPointsToTeam(repository))
         ).create(CounterViewModel::class.java)
     //Replace with injector
 

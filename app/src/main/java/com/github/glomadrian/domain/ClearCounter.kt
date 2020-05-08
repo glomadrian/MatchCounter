@@ -1,28 +1,22 @@
 package com.github.glomadrian.domain
 
 import com.github.glomadrian.CounterRepository
+import com.github.glomadrian.architecture.Middleware
+import com.github.glomadrian.counter.CounterAction
 import com.github.glomadrian.counter.CounterResult
+import com.github.glomadrian.ofType
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlin.random.Random
 
 class ClearCounter(
     private val repository: CounterRepository
-) {
+) : Middleware<CounterAction, CounterResult> {
 
-    operator fun invoke(): Flow<CounterResult> =
-        repository.clearCounter().map {
-        CounterResult.CounterCleared
-        }.flatMapConcat {
-            randomlyFail(it)
-        }
-
-    private fun randomlyFail(result: CounterResult) = flow {
-        if (Random.nextBoolean()) {
-            throw IllegalAccessException()
-        }
-        emit(result)
-    }
+    override fun bind(actions: Flow<CounterAction>) =
+        actions.ofType<CounterAction.ClearTeamPoints>()
+            .map {
+                repository.clearCounter()
+            }.map {
+                CounterResult.CounterCleared
+            }
 }

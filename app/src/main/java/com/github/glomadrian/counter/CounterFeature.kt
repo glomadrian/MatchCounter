@@ -25,7 +25,12 @@ data class CounterViewState(
     val teamAPoints: Int = 0,
     val teamBPoints: Int = 0,
     val error: Throwable?
-) : State
+) : State {
+
+    companion object {
+        fun initState() = CounterViewState(false, 0 ,0, null)
+    }
+}
 
 sealed class CounterResult : Result {
     object NoResult : CounterResult()

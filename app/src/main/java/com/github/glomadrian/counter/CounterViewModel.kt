@@ -1,16 +1,13 @@
 package com.github.glomadrian.counter
 
 import androidx.lifecycle.ViewModelProvider
-import com.github.glomadrian.architecture.ActionExecutor
-import com.github.glomadrian.architecture.Middleware
-import com.github.glomadrian.architecture.Reducer
+import com.github.glomadrian.architecture.Store
 import com.github.glomadrian.architecture.ViewModel
 
 class CounterViewModel(
-    reducerHandler: Reducer<CounterResult, CounterViewState>,
-    middleware: List<Middleware<CounterAction, CounterResult>>
+    store: Store<CounterAction, CounterResult, CounterViewState>
 ) : ViewModel<CounterIntent, CounterViewState, CounterAction, CounterResult>(
-    reducerHandler, middleware
+    store
 ) {
 
     override suspend fun handleIntent(intent: CounterIntent) =
@@ -22,13 +19,10 @@ class CounterViewModel(
             CounterIntent.ClearCounter -> CounterAction.ClearTeamPoints
         }
 
-    override fun initialState() = CounterViewState(false, 0, 0, null)
-
     class Factory(
-        private val reducerHandler: Reducer<CounterResult, CounterViewState>,
-        private val middleware: List<Middleware<CounterAction, CounterResult>>
+        private val store: Store<CounterAction, CounterResult, CounterViewState>
     ) : ViewModelProvider.Factory {
         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
-            CounterViewModel(reducerHandler, middleware) as T
+            CounterViewModel(store) as T
     }
 }

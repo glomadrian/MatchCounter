@@ -1,18 +1,31 @@
 package com.github.glomadrian.domain
 
 import com.github.glomadrian.CounterRepository
+import com.github.glomadrian.architecture.Middleware
+import com.github.glomadrian.counter.CounterAction
 import com.github.glomadrian.counter.CounterResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 
-class AddPointsToTeam(private val counterRepository: CounterRepository) {
+class AddPointsToTeam(
+    private val counterRepository: CounterRepository
+) : Middleware<CounterAction, CounterResult> {
 
-    operator fun invoke(points: Int, team: Team): Flow<CounterResult> =
-        counterRepository.addPointsToTeam(points, team).map {
-            CounterResult.AddPointsResult.PointsAdded(points, team)
-        }.catch {
-            CounterResult.AddPointsResult.PointNotAddedError
+    override fun bind(actions: Flow<CounterAction>): Flow<CounterResult.AddPointsResult> = actions
+        .filter { it is CounterAction.AddPointsToTeam }
+        .map { it as CounterAction.AddPointsToTeam }
+        .flatMapConcat {
+            addPointsToTeam(it.points, it.team)
         }
 
+    private fun addPointsToTeam(points: Int, team: Team) = counterRepository.addPointsToTeam(
+        points, team
+    ).map<Unit, CounterResult.AddPointsResult> {
+        CounterResult.AddPointsResult.PointsAdded(points, team)
+    }.catch {
+        emit(CounterResult.AddPointsResult.PointNotAddedError)
+    }
 }
