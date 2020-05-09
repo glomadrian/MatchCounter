@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.github.glomadrian.CounterMemoryDataSource
 import com.github.glomadrian.CounterRepository
+import com.github.glomadrian.actiondecorator.ActionLogger
 import com.github.glomadrian.architecture.Store
 import com.github.glomadrian.architecture.View
 import com.github.glomadrian.clicks
@@ -30,7 +31,8 @@ class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterInten
         val store = Store(
             CounterReducer(),
             middlewares,
-            CounterViewState.initState()
+            CounterViewState.initState(),
+            listOf(ActionLogger())
         )
         ViewModelProvider(
             this,
