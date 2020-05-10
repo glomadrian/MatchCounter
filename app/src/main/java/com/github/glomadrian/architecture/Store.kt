@@ -15,14 +15,18 @@ import kotlinx.coroutines.flow.scan
 class Store<A : Action, R : Result, S : State>(
     private val reducer: Reducer<R, S>,
     private val middleware: List<Middleware<A, R>>,
-    private val initState: S
+    private val initState: S,
+    private val actionChanel: ActionChannel = ActionChannel
 ) {
     private val stateLiveData: MutableLiveData<S> = MutableLiveData()
 
     fun getState(): LiveData<S> = stateLiveData
 
     fun dispatch(action: Flow<A>, onUnexpectedError: () -> Unit?): Flow<S> =
-        middleware.asFlow()
+        action.onEach {
+            actionChanel.emitAction(it)
+        }
+            .flatMapMerge { middleware.asFlow() }
             .flatMapMerge { it.bind(action) }
             .scan(currentStateOrDefault()) { acc, value -> reducer.reduce(acc, value) }
             .distinctUntilChanged()

@@ -33,7 +33,7 @@ class CounterReducer : Reducer<CounterResult, CounterViewState> {
         )
     }
 
-    private fun pointNotAddedErrorReducer(previousState: CounterViewState) = previousState
+    private fun pointNotAddedErrorReducer(previousState: CounterViewState) = previousState.copy(error = IllegalAccessError())
 
     private fun loadingReducer(previousState: CounterViewState) =
         previousState.copy(isLoading = true)
