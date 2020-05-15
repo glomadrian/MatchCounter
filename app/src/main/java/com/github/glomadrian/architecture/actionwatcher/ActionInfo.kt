@@ -1,4 +1,4 @@
-package com.github.glomadrian.architecture.actiondebuger
+package com.github.glomadrian.architecture.actionwatcher
 
 import com.github.glomadrian.architecture.Action
 

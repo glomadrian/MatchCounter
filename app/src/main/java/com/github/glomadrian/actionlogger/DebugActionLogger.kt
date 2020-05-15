@@ -1,4 +1,4 @@
-package com.github.glomadrian.architecture.actionlogger
+package com.github.glomadrian.actionlogger
 
 import android.util.Log
 import com.github.glomadrian.BuildConfig

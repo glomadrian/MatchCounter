@@ -1,4 +1,4 @@
-package com.github.glomadrian.architecture.actiondebuger
+package com.github.glomadrian.architecture.actionwatcher
 
 class CircularList<T>(size: Int) : ArrayList<T>(size) {
     private val circularListSize = size
