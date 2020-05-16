@@ -118,6 +118,16 @@
         android:layout_width="200dp"
         android:layout_height="50dp" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/actionViewer"
+        app:layout_constraintBottom_toTopOf="@id/addMovie"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"
+        android:text="View counter actions"
+        android:layout_width="200dp"
+        android:layout_height="50dp" />
+
     <ProgressBar
         android:id="@+id/loading"
         app:layout_constraintStart_toStartOf="parent"

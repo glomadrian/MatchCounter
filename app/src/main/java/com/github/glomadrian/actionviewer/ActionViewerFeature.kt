@@ -16,7 +16,11 @@ sealed class ActionViewerAction : Action {
 
 data class ActionViewerState(
     val actions: List<ActionViewModel> = emptyList()
-) : State
+) : State {
+    companion object {
+        fun initState() = ActionViewerState()
+    }
+}
 
 
 sealed class ActionViewerResult : Result {
