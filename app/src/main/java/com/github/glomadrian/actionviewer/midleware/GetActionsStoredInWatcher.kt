@@ -15,7 +15,5 @@ class GetActionsStoredInWatcher : Middleware<ActionViewerAction, ActionViewerRes
         .filterIsInstance<ActionViewerAction.ShowActionList>()
         .map {
             ActionViewerResult.ActionList(ActionDebugger.getActions())
-        }.catch {
-            it
         }
 }
