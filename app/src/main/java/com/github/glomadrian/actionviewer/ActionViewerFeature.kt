@@ -31,5 +31,7 @@ sealed class ActionViewerResult : Result {
 data class ActionViewModel(
     val time: Long,
     val name: String,
-    val color: Int
+    val actionData: String,
+    val lineColor: Int,
+    val circleColor: Int
 )
