@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/timeline"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="60dp"
+        android:layout_height="0dp">
+
+        <FrameLayout
+            android:id="@+id/line"
+            android:layout_width="6dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@color/colorAccent" />
+
+        <FrameLayout
+            android:id="@+id/circle"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/circle" />
+    </FrameLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/action_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toEndOf="@id/timeline"
+        app:layout_constraintTop_toTopOf="parent"
+        android:includeFontPadding="false"
+        android:textStyle="bold"
+        tools:text="Some action launched" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toEndOf="@id/timeline"
+        app:layout_constraintTop_toTopOf="@id/action_name"
+        android:includeFontPadding="false"
+        android:textSize="12sp"
+        android:textColor="#8C8E8D"
+        tools:text="18:55" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/action_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        app:layout_constraintStart_toEndOf="@id/timeline"
+        app:layout_constraintTop_toTopOf="@id/time"
+        android:includeFontPadding="false"
+        android:textSize="12sp"
+        android:layout_marginBottom="24dp"
+        tools:text="AddPointsToTeam(points=5, team=com.github.glomadrian.counter.model.Team$A@7773fd8)" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

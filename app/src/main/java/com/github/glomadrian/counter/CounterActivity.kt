@@ -1,5 +1,6 @@
 package com.github.glomadrian.counter
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
@@ -9,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.github.glomadrian.CounterMemoryDataSource
 import com.github.glomadrian.CounterRepository
+import com.github.glomadrian.actionviewer.ActionViewerActivity
 import com.github.glomadrian.architecture.Store
 import com.github.glomadrian.architecture.View
 import com.github.glomadrian.clicks
@@ -67,6 +69,9 @@ class CounterActivity : AppCompatActivity(), View<CounterViewState, CounterInten
         setContentView(binding.root)
         feedViewModel.processIntents(intents())
         feedViewModel.state().observe(this, stateObserver())
+        binding.actionViewer.setOnClickListener {
+            startActivity(Intent(this, ActionViewerActivity::class.java))
+        }
     }
 
     private fun stateObserver() = Observer<CounterViewState> {

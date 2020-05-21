@@ -1,8 +1,8 @@
 package com.github
 
 import android.app.Application
-import com.github.glomadrian.architecture.actiondebuger.ActionDebugger
-import com.github.glomadrian.architecture.actionlogger.DebugActionLogger
+import com.github.glomadrian.architecture.actionwatcher.ActionDebugger
+import com.github.glomadrian.actionlogger.DebugActionLogger
 
 class MatchApplication : Application() {
 
